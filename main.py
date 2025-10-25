@@ -44,7 +44,7 @@ def get_args_parser():
     # Model parameters
     parser.add_argument('--model', default='crossvit_18_224', type=str, metavar='MODEL',
                         help='Name of model to train')
-    parser.add_argument('--input-size', default=224, type=int, help='images input size')  # 使用标准的224x224分辨率
+    parser.add_argument('--input-size', default=384, type=int, help='images input size')  # 使用标准的224x224分辨率
 
     parser.add_argument('--drop', type=float, default=0.0, metavar='PCT',
                         help='Dropout rate (default: 0.)')
@@ -167,8 +167,8 @@ def get_args_parser():
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
 
     parser.add_argument('--auto-resume', action='store_true', help='auto resume')
-    parser.add_argument('--finetune', action='store_true', help='finetune model')
-    parser.add_argument('--initial_checkpoint', type=str, default='./models/crossvit_18_224.pth', help='path to the pretrained model')
+    parser.add_argument('--finetune', default=True,action='store_true', help='finetune model')
+    parser.add_argument('--initial_checkpoint', type=str, default='./model/model_best.pth', help='path to the pretrained model')
 
     return parser
 
@@ -259,7 +259,7 @@ def main(args):
 
     if args.initial_checkpoint:
         print("Loading pretrained model")
-        checkpoint = torch.load(args.initial_checkpoint, map_location='cpu')
+        checkpoint = torch.load(args.initial_checkpoint, map_location='cpu',weights_only=False)
         # Check if checkpoint has 'model' key, otherwise use the checkpoint directly
         if 'model' in checkpoint:
             utils.load_checkpoint(model, checkpoint['model'])
@@ -277,7 +277,7 @@ def main(args):
             checkpoint = torch.hub.load_state_dict_from_url(
                 args.resume, map_location='cpu', check_hash=True)
         else:
-            checkpoint = torch.load(args.resume, map_location='cpu')
+            checkpoint = torch.load(args.resume, map_location='cpu',weights_only=False)
         # Check if checkpoint has 'model' key, otherwise use the checkpoint directly
         if 'model' in checkpoint:
             utils.load_checkpoint(model, checkpoint['model'])
